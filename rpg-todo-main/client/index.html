@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RPG Todo</title>
+    <style>
+      /* Fallback styles that load immediately */
+      body { margin: 0; font-family: sans-serif; }
+      #offline-fallback {
+        display: flex; /* VISIBLE BY DEFAULT */
+        position: fixed;
+        inset: 0;
+        background: #0f172a;
+        color: white;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 20px;
+        z-index: 9999;
+      }
+      #offline-fallback.hidden { display: none; }
+      #root { display: none; } /* Hidden by default */
+      #root.visible { display: block; }
+    </style>
+    <!-- Modern RPG Fonts - only load if online -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <!-- Offline fallback (VISIBLE BY DEFAULT, hidden when online) -->
+    <div id="offline-fallback">
+      <div style="max-width: 500px;">
+        <div style="font-size: 4rem; margin-bottom: 1rem;">📡</div>
+        <h1 style="font-size: 2rem; margin-bottom: 1rem;">You're Offline</h1>
+        <p style="font-size: 1.125rem; margin-bottom: 2rem; opacity: 0.9;">
+          TaskQuest requires an internet connection to load. Please check your connection and try again.
+        </p>
+        <p style="font-size: 1rem; margin-bottom: 1rem; color: #06b6d4; font-weight: 600;">
+          Waiting for connection...
+        </p>
+        <p style="font-size: 0.875rem; margin-top: 1.5rem; opacity: 0.7;">
+          Will auto-retry when connection is restored...
+        </p>
+      </div>
+    </div>
+    
+    <!-- App root (HIDDEN BY DEFAULT, shown when online) -->
+    <div id="root"></div>
+    
+    <noscript>
+      <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #0f172a; color: white; font-family: sans-serif; text-align: center; padding: 20px;">
+        <div>
+          <h1 style="font-size: 2rem; margin-bottom: 1rem;">⚠️ JavaScript Required</h1>
+          <p>TaskQuest requires JavaScript to run. Please enable JavaScript in your browser.</p>
+        </div>
+      </div>
+    </noscript>
+    
+    <script>
+      (function() {
+        var offlineFallback = document.getElementById('offline-fallback');
+        var root = document.getElementById('root');
+        var moduleLoaded = false;
+        var loadTimeout;
+        
+        function showOffline() {
+          console.log('Showing offline screen');
+          if (offlineFallback) offlineFallback.classList.remove('hidden');
+          if (root) root.classList.remove('visible');
+        }
+        
+        function showOnline() {
+          console.log('Showing online app');
+          if (offlineFallback) offlineFallback.classList.add('hidden');
+          if (root) root.classList.add('visible');
+        }
+        
+        // Catch any errors during module loading
+        window.addEventListener('error', function(e) {
+          console.error('Error caught:', e.message);
+          if (e.message && e.message.includes('module')) {
+            console.log('Module error detected, showing offline screen');
+            showOffline();
+            e.preventDefault();
+          }
+        }, true);
+        
+        // Set a timeout - if the module doesn't load in 3 seconds, show offline
+        loadTimeout = setTimeout(function() {
+          if (!moduleLoaded && !document.querySelector('#root > *')) {
+            console.log('Module load timeout, showing offline screen');
+            showOffline();
+          }
+        }, 3000);
+        
+        // Check if we should even try to load
+        if (navigator.onLine) {
+          // We think we're online, try to load the app
+          // DON'T hide offline screen yet - wait until module loads
+          
+          // Load the app module
+          var script = document.createElement('script');
+          script.type = 'module';
+          script.src = '/src/main.jsx';
+          
+          script.onload = function() {
+            console.log('Module loaded successfully');
+            moduleLoaded = true;
+            clearTimeout(loadTimeout);
+            // NOW show the app since module loaded
+            showOnline();
+          };
+          
+          script.onerror = function(e) {
+            console.error('Module failed to load');
+            clearTimeout(loadTimeout);
+            showOffline();
+          };
+          
+          document.body.appendChild(script);
+        } else {
+          // Definitely offline
+          showOffline();
+        }
+        
+        // Monitor for connection changes
+        window.addEventListener('online', function() {
+          window.location.reload();
+        });
+        
+        window.addEventListener('offline', function() {
+          showOffline();
+        });
+      })();
+    </script>
+  </body>
+</html>
+
+

@@ -1,0 +1,30 @@
+---
+alwaysApply: true
+---
+
+# Framework Glossary
+
+This glossary helps route coding standards based on the framework or technology being used.
+
+## React
+JavaScript library for building user interfaces. Used for all frontend components in this project. Key concepts: components, props, state, hooks, JSX. When working with React components, routing, state management, or frontend UI logic, refer to `react-standards.mdc`.
+
+## Express
+Node.js web framework for building backend APIs and servers. Used for API endpoints, middleware, routing, and server logic. When working with backend APIs, routes, middleware, or server-side logic, refer to `express-standards.mdc`.
+
+## Supabase
+PostgreSQL-based backend-as-a-service providing database, authentication, and real-time features. Used for database operations, queries, schema design, and data access. When working with database queries, schema, migrations, or Supabase client operations, refer to `supabase-standards.mdc`.
+
+## Shadcn
+Collection of re-usable components built on Radix UI and Tailwind CSS. Used for UI components like buttons, forms, dialogs, etc. When working with Shadcn components, component composition, or UI component implementation, refer to `shadcn-standards.mdc`.
+
+## Tailwind CSS
+Utility-first CSS framework for styling. Used throughout the project for all styling needs. When working with styling, responsive design, theme configuration, or CSS classes, refer to `tailwind-standards.mdc`.
+
+## Routing Guide
+
+- **Frontend components/UI**: Use `react-standards.mdc` + `shadcn-standards.mdc` + `tailwind-standards.mdc`
+- **Backend API/server**: Use `express-standards.mdc` + `supabase-standards.mdc`
+- **Database/Schema**: Use `supabase-standards.mdc`
+- **Styling/Theme**: Use `tailwind-standards.mdc` + `shadcn-standards.mdc`
+- **Component styling**: Use `react-standards.mdc` + `tailwind-standards.mdc`

@@ -1,0 +1,85 @@
+---
+alwaysApply: false
+---
+
+# React Coding Standards
+
+## Component Structure
+
+- Use functional components with hooks, not class components
+- One component per file
+- Use PascalCase for component names and filenames
+- Export components as default exports
+- Keep components focused and single-responsibility
+
+## File Organization
+
+```
+ComponentName.tsx
+ComponentName.module.css (if needed)
+```
+
+## Props and Types
+
+- Use TypeScript interfaces for props
+- Define props interfaces above or in separate types file
+- Use descriptive prop names
+- Destructure props at component declaration
+- Provide default values using default parameters when appropriate
+
+## State Management
+
+- Use `useState` for local component state
+- Use `useEffect` for side effects with proper dependency arrays
+- Avoid unnecessary re-renders by memoizing when needed
+- Keep state as close to where it's used as possible
+- Lift state up only when multiple components need it
+
+## Hooks
+
+- Custom hooks should start with "use" prefix
+- Extract reusable logic into custom hooks
+- Keep hooks focused on a single concern
+- Document hook parameters and return values
+
+## JSX and Rendering
+
+- Use JSX fragments (`<>...</>`) instead of unnecessary divs
+- Use conditional rendering with ternary or logical operators appropriately
+- Map over arrays with proper keys (use stable IDs, not index)
+- Avoid inline functions in JSX when possible (use useCallback for callbacks)
+
+## Component Composition
+
+- Prefer composition over prop drilling
+- Break down complex components into smaller sub-components
+- Use children prop for flexible component composition
+- Keep component trees shallow when possible
+
+## Event Handlers
+
+- Name event handlers with "handle" prefix (e.g., `handleSubmit`)
+- Use arrow functions or bind in constructor for class methods
+- Avoid creating new functions in render (use useCallback when needed)
+
+## Code Style
+
+- Use 2 spaces for indentation
+- Use single quotes for strings
+- Add trailing commas in multiline objects/arrays
+- Use semicolons consistently
+- Maximum line length: 100 characters
+
+## Accessibility
+
+- Use semantic HTML elements
+- Provide proper ARIA labels when needed
+- Ensure keyboard navigation works
+- Maintain focus management in modals/dialogs
+
+## Performance
+
+- Memoize expensive computations with useMemo
+- Use React.memo for components that render frequently with same props
+- Lazy load components when appropriate
+- Avoid creating objects/arrays in render that are used as dependencies

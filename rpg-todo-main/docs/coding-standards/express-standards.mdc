@@ -1,0 +1,83 @@
+---
+alwaysApply: false
+---
+
+# Express Coding Standards
+
+## Project Structure
+
+- Organize routes in separate files/modules
+- Use controllers for business logic
+- Keep middleware separate and reusable
+- Use environment variables for configuration
+- Structure: `routes/`, `controllers/`, `middleware/`, `utils/`
+
+## Route Organization
+
+- Use Express Router for route modules
+- Group related routes together
+- Use RESTful naming conventions for routes
+- Document route purpose and expected parameters
+
+## Request/Response Handling
+
+- Use async/await for asynchronous operations
+- Handle errors properly with try/catch or error middleware
+- Validate request data before processing
+- Send appropriate HTTP status codes
+- Return consistent response format (JSON)
+
+## Error Handling
+
+- Use centralized error handling middleware
+- Create custom error classes for different error types
+- Always handle promise rejections
+- Provide meaningful error messages
+- Log errors for debugging
+
+## Middleware
+
+- Order middleware correctly (error handlers last)
+- Create reusable middleware functions
+- Use Express built-in middleware when appropriate
+- Validate authentication/authorization in middleware
+- Keep middleware focused on single responsibility
+
+## Security
+
+- Validate and sanitize all user input
+- Use parameterized queries (never string concatenation)
+- Implement proper authentication middleware
+- Use HTTPS in production
+- Set security headers appropriately
+- Rate limit API endpoints
+
+## Environment Configuration
+
+- Use environment variables for sensitive data
+- Never commit secrets to version control
+- Use `.env` files for local development
+- Validate required environment variables on startup
+
+## Code Style
+
+- Use 2 spaces for indentation
+- Use camelCase for variables and functions
+- Use PascalCase for classes/constructors
+- Use UPPER_CASE for constants
+- Maximum line length: 100 characters
+
+## API Design
+
+- Use RESTful conventions
+- Version APIs when making breaking changes
+- Document API endpoints
+- Use appropriate HTTP methods (GET, POST, PUT, PATCH, DELETE)
+- Return consistent error response structure
+
+## Logging
+
+- Log important events (requests, errors, authentication)
+- Use appropriate log levels (info, warn, error)
+- Avoid logging sensitive information
+- Structure logs for easy parsing

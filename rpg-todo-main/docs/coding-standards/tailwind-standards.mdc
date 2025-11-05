@@ -1,0 +1,83 @@
+---
+alwaysApply: false
+---
+
+# Tailwind CSS Coding Standards
+
+## Utility Classes
+
+- Use utility classes directly in JSX/TSX
+- Prefer composition of utilities over custom CSS
+- Use responsive prefixes (sm:, md:, lg:, xl:, 2xl:) for breakpoints
+- Group related utilities together for readability
+
+## Customization
+
+- Configure theme in `tailwind.config.js`
+- Extend theme rather than replacing defaults
+- Use CSS variables for theme values when needed
+- Follow design system colors and spacing
+
+## Class Organization
+
+- Order classes: layout → spacing → sizing → typography → colors → effects
+- Use `cn()` utility from shadcn/ui for conditional classes
+- Break long class lists into multiple lines for readability
+- Use component variants when repeating class combinations
+
+## Responsive Design
+
+- Mobile-first approach (base styles, then breakpoints)
+- Use consistent breakpoint usage across the app
+- Test at all breakpoints during development
+- Use container queries when appropriate (if supported)
+
+## Color System
+
+- Use theme colors (deep blues and greens for this project)
+- Use semantic color names (primary, secondary, destructive, etc.)
+- Maintain color consistency with Shadcn theme
+- Use opacity modifiers for color variations
+
+## Spacing and Sizing
+
+- Use Tailwind's spacing scale consistently
+- Use rem/em units via Tailwind scale, not px
+- Use fractional values for sizing (w-1/2, w-1/3, etc.)
+- Use aspect-ratio utilities for responsive media
+
+## Typography
+
+- Use Tailwind's typography utilities
+- Maintain consistent font sizes across the app
+- Use font-weight utilities appropriately
+- Use text utilities for alignment and decoration
+
+## State Variants
+
+- Use state variants (hover:, focus:, active:, disabled:)
+- Maintain consistent interaction states
+- Use group and peer for complex interactions
+- Test all interactive states
+
+## Dark Mode
+
+- Use `dark:` variant for dark mode styles
+- Maintain contrast ratios in both modes
+- Test dark mode implementation thoroughly
+- Follow system preference or user toggle
+
+## Code Style
+
+- Keep utility classes on same line when short
+- Break into multiple lines for readability when long
+- Use arbitrary values sparingly (prefer theme)
+- Comment complex utility combinations
+
+## Best Practices
+
+- Avoid inline styles - use Tailwind utilities
+- Extract repeated class combinations to components
+- Use @apply in CSS only when absolutely necessary
+- Maintain consistency with Shadcn component styling
+- Keep utilities readable and maintainable
