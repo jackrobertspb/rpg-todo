@@ -11,16 +11,30 @@ export function useAuth() {
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [initialCheckDone, setInitialCheckDone] = useState(false);
 
   useEffect(() => {
+    // Safety timeout - force stop loading after 5 seconds
+    const timeout = setTimeout(() => {
+      if (loading) {
+        console.warn('Auth check timeout - forcing stop loading');
+        setLoading(false);
+      }
+    }, 5000);
+
     // Check for existing session immediately
     checkSession();
 
-    // Listen for auth changes
+    // Listen for auth changes (but only fetch profile if initial check is done)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        // Skip if this is the initial SIGNED_IN event (checkSession handles it)
+        if (!initialCheckDone && event === 'SIGNED_IN') {
+          return;
+        }
+        
         if (session) {
-          await fetchUserProfile(session.user.id);
+          await fetchUserProfile(session.user.id, session);
         } else {
           setUser(null);
           setLoading(false);
@@ -29,42 +43,33 @@ export function AuthProvider({ children }) {
     );
 
     return () => {
+      clearTimeout(timeout);
       subscription.unsubscribe();
     };
   }, []);
 
   const checkSession = async () => {
     try {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('checkSession called');
-      }
       const { data: { session } } = await supabase.auth.getSession();
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Session check result:', session ? 'Session exists' : 'No session');
-      }
+      
       if (session) {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('Session found, fetching profile for user:', session.user.id);
-        }
-        // Pass session to avoid re-fetching it
         await fetchUserProfile(session.user.id, session);
       } else {
         setUser(null);
         setLoading(false);
       }
+      
+      setInitialCheckDone(true);
     } catch (error) {
       console.error('Error checking session:', error);
       setUser(null);
       setLoading(false);
+      setInitialCheckDone(true);
     }
   };
 
   const fetchUserProfile = async (userId, session = null) => {
     try {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('fetchUserProfile called for userId:', userId);
-      }
-      
       // Use provided session or get it once
       let authSession = session;
       if (!authSession) {
@@ -77,37 +82,21 @@ export function AuthProvider({ children }) {
         authSession = fetchedSession;
       }
 
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Fetching profile from database...');
-      }
-
       const { data: user, error } = await supabase
         .from('user_profiles')
         .select('id, username, email, current_level, total_xp, profile_picture_url, bio, role')
         .eq('id', userId)
         .single();
 
-      if (error) {
+      if (error || !user) {
         console.error('Error fetching user profile:', error);
         setUser(null);
         setLoading(false);
         return;
       }
 
-      if (!user) {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('No user profile found');
-        }
-        setUser(null);
-        setLoading(false);
-        return;
-      }
-
-      if (process.env.NODE_ENV === 'development') {
-        console.log('User profile fetched successfully');
-      }
       setUser(user);
-      setLoading(false); // CRITICAL: Set loading to false on success
+      setLoading(false);
     } catch (error) {
       console.error('Error fetching user profile:', error);
       setUser(null);

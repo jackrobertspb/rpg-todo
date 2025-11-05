@@ -2,19 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  .overflow-wrap-anywhere {
+    overflow-wrap: anywhere;
+  }
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #1e3a5f;
+  --background: #f0fdfa;
+  --foreground: #134e4a;
 }
 
 .dark {
-  --background: #152238;
-  --foreground: #f0f0f0;
+  --background: #042f2e;
+  --foreground: #f0fdfa;
 }
 
 body {
   margin: 0;
-  font-family: 'Georgia', serif;
+  font-family: 'Inter', system-ui, sans-serif;
   background-color: var(--background);
   color: var(--foreground);
 }

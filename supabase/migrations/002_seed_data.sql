@@ -26,8 +26,8 @@ INSERT INTO levels (level_number, xp_required) VALUES
 (19, 400000), -- Level 19: 400,000 XP
 (20, 550000); -- Level 20: 550,000 XP
 
--- Seed 10 achievements (PRD line 285: exactly 10 achievements as listed)
--- Matching acceptance criteria list: Task Creator I-III, Priority Masters, Level 5/10/15 Achievers, Label Creator I
+-- Seed 13 achievements (PRD lines 93-96)
+-- Task Creator I-III (3), Priority Masters (3), Level Achievers (4), Label Creator I-III (3)
 INSERT INTO achievements (name, description, xp_bonus, criteria_type, criteria_value) VALUES
 -- Task creation achievements (PRD line 93: 5, 10, 20 tasks)
 ('Task Creator I', 'Create 5 tasks', 50, 'task_creation', 5),
@@ -39,13 +39,16 @@ INSERT INTO achievements (name, description, xp_bonus, criteria_type, criteria_v
 ('Medium Priority Task Master', 'Complete a medium priority task', 15, 'task_completion', 2),
 ('Low Priority Task Master', 'Complete a low priority task', 10, 'task_completion', 3),
 
--- Level milestone achievements (PRD line 95: levels 5, 10, 15 - line 285 lists only these three)
+-- Level milestone achievements (PRD line 95: levels 5, 10, 15, and 20)
 ('Level 5 Achiever', 'Reach level 5', 100, 'level_milestone', 5),
 ('Level 10 Achiever', 'Reach level 10', 250, 'level_milestone', 10),
 ('Level 15 Achiever', 'Reach level 15', 500, 'level_milestone', 15),
+('Level 20 Achiever', 'Reach level 20', 1000, 'level_milestone', 20),
 
--- Label Creator achievement (PRD line 285: Label Creator I only, though line 96 mentions 3, 5, 10)
-('Label Creator I', 'Create 3 custom labels', 30, 'label_creation', 3);
+-- Label Creator achievements (PRD line 96: creating 3, 5, and 10 custom labels)
+('Label Creator I', 'Create 3 custom labels', 30, 'label_creation', 3),
+('Label Creator II', 'Create 5 custom labels', 50, 'label_creation', 5),
+('Label Creator III', 'Create 10 custom labels', 100, 'label_creation', 10);
 
 -- Function to create default labels for a new user upon registration
 -- Default labels: 'Work', 'Personal', 'Errands', 'Goals' (PRD line 82, 287)

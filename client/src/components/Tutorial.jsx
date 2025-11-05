@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { cn } from '../utils/cn';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
 export default function Tutorial({ onComplete }) {
   const [step, setStep] = useState(0);
@@ -24,18 +26,13 @@ export default function Tutorial({ onComplete }) {
       button: 'Next',
     },
     {
-      title: 'View Achievements',
-      content: 'Earn achievements by creating tasks, completing tasks, leveling up, and creating labels.',
-      button: 'View Achievements',
-      action: () => {
-        navigate('/achievements');
-        // Move to next step after navigating
-        setTimeout(() => setStep(step + 1), 100);
-      },
+      title: 'Unlock Achievements',
+      content: 'Earn achievements by creating tasks, completing them, leveling up, and creating custom labels. Check the Achievements page to see all available achievements!',
+      button: 'Next',
     },
     {
       title: 'Track Your Progress',
-      content: 'Check your profile to see your level, XP, and earned achievements. The progress bar shows your journey to the next level!',
+      content: 'Check your Profile to see your level, XP, and earned achievements. The progress bar in the header shows your journey to the next level. Now start completing tasks and level up!',
       button: 'Got it!',
     },
   ];
@@ -44,7 +41,7 @@ export default function Tutorial({ onComplete }) {
 
   // Close tutorial if user navigates away from dashboard
   useEffect(() => {
-    if (location.pathname !== '/dashboard' && location.pathname !== '/achievements') {
+    if (location.pathname !== '/dashboard') {
       onComplete();
     }
   }, [location.pathname, onComplete]);
@@ -77,7 +74,7 @@ export default function Tutorial({ onComplete }) {
       )}>
         <div className="flex justify-between items-start mb-4">
           <h2 className={cn(
-            "text-2xl font-rpg font-bold",
+            "text-2xl font-sans font-bold",
             "text-primary dark:text-white"
           )}>
             {currentStep.title}

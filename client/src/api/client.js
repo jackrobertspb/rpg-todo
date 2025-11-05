@@ -2,7 +2,7 @@ import axios from 'axios';
 import { supabase } from '../lib/supabase';
 
 const apiClient = axios.create({
-  baseURL: '/api',
+  baseURL: 'http://localhost:3002/api',
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
@@ -17,6 +17,18 @@ apiClient.interceptors.request.use(async (config) => {
   }
   return config;
 });
+
+// Handle network errors gracefully
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Check if it's a network error (offline)
+    if (!error.response) {
+      error.message = 'You are currently offline. Please check your internet connection.';
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default apiClient;
 

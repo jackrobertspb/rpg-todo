@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { cn } from '../utils/cn';
+import { cn } from '@/lib/utils';
 
 export default function Register() {
   const [username, setUsername] = useState('');
@@ -41,12 +41,12 @@ export default function Register() {
         "shadow-lg"
       )}>
         <h1 className={cn(
-          "text-3xl font-rpg font-bold mb-6 text-center",
+          "text-3xl font-sans font-bold mb-6 text-center",
           "text-primary dark:text-white"
         )}>
           RPG Todo
         </h1>
-        <h2 className="text-2xl font-rpg font-bold mb-6 text-center text-primary dark:text-white">
+        <h2 className="text-2xl font-sans font-bold mb-6 text-center text-primary dark:text-white">
           Register
         </h2>
         {error && (

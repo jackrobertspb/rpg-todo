@@ -24,25 +24,8 @@ export async function updateUserXPAndLevel(userId, xpEarned) {
     throw new Error('User not found');
   }
 
-  // Add XP earned
+  // Add XP earned (only task XP, achievement bonuses are added separately when earned)
   let newTotalXP = user.total_xp + xpEarned;
-
-  // Check for achievement bonus XP
-  const { data: achievements } = await supabase
-    .from('user_achievements')
-    .select('achievement_id, achievements(xp_bonus)')
-    .eq('user_id', userId)
-    .not('achievements.xp_bonus', 'is', null);
-
-  // Add bonus XP from achievements
-  if (achievements) {
-    const bonusXP = achievements.reduce((sum, ua) => {
-      return sum + (ua.achievements?.xp_bonus || 0);
-    }, 0);
-    // Note: PRD line 71 says "Award bonus XP for relevant achievements earned"
-    // This is cumulative bonus XP, applied each time
-    newTotalXP += bonusXP;
-  }
 
   // Determine new level based on XP
   const { data: levels } = await supabase

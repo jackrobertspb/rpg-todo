@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { cn } from '../utils/cn';
+import { cn } from '@/lib/utils';
 
 export default function ProgressBar({ currentXP, currentLevel }) {
   // Hardcoded levels data to avoid API call - matches database seed
@@ -55,22 +55,27 @@ export default function ProgressBar({ currentXP, currentLevel }) {
   return (
     <div className="w-full">
       <div className="flex justify-between text-xs text-white mb-1">
-        <span>Level {currentLevelInfo.level_number}</span>
-        <span>
+        <span className="font-semibold">Level {currentLevelInfo.level_number}</span>
+        <span className="font-semibold">
           {nextLevelInfo.level_number > currentLevelInfo.level_number 
-            ? `${Math.max(0, Math.round(currentXP - currentLevelInfo.xp_required))} / ${nextLevelInfo.xp_required - currentLevelInfo.xp_required} XP`
+            ? `${Math.max(0, Math.round(currentXP - currentLevelInfo.xp_required)).toLocaleString()} / ${(nextLevelInfo.xp_required - currentLevelInfo.xp_required).toLocaleString()} XP`
             : 'Max Level'}
         </span>
       </div>
       <div className={cn(
-        "w-full h-2 bg-secondary-dark rounded-full overflow-hidden"
+        "w-full h-3 bg-white/20 rounded-full overflow-hidden shadow-inner"
       )}>
         <div
           className={cn(
-            "h-full bg-secondary transition-all duration-300"
+            "h-full rounded-full transition-all duration-300 relative",
+            "bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500",
+            "shadow-[0_0_10px_rgba(250,204,21,0.6)]"
           )}
           style={{ width: `${progressPercent}%` }}
-        />
+        >
+          {/* Shimmer effect */}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer" />
+        </div>
       </div>
     </div>
   );

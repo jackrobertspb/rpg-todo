@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import apiClient from '../api/client';
-import { cn } from '../utils/cn';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import toast from 'react-hot-toast';
+import ConfirmModal from '../components/ConfirmModal';
 
 export default function TaskHistory() {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     fetchHistory();
@@ -21,6 +25,17 @@ export default function TaskHistory() {
     }
   };
 
+  const handleDeleteAllCompleted = async () => {
+    try {
+      await apiClient.delete('/tasks/debug/delete-completed');
+      setTasks([]);
+      toast.success('All completed tasks deleted!');
+    } catch (error) {
+      console.error('Error deleting completed tasks:', error);
+      toast.error('Failed to delete completed tasks');
+    }
+  };
+
   if (loading) {
     return <div className="container mx-auto px-4 py-8">Loading...</div>;
   }
@@ -31,12 +46,22 @@ export default function TaskHistory() {
       "bg-white dark:bg-primary-dark"
     )}>
       <div className="container mx-auto px-4 py-8">
-        <h1 className={cn(
-          "text-3xl font-rpg font-bold mb-6",
-          "text-primary dark:text-white"
-        )}>
-          Task Completion History
-        </h1>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className={cn(
+            "text-3xl font-sans font-bold",
+            "text-primary dark:text-white"
+          )}>
+            Task Completion History
+          </h1>
+          {tasks.length > 0 && (
+            <Button
+              onClick={() => setShowDeleteConfirm(true)}
+              variant="destructive"
+            >
+              🗑️ Clear All History
+            </Button>
+          )}
+        </div>
         {tasks.length > 0 ? (
           <div className="space-y-4">
             {tasks.map((task) => (
@@ -82,7 +107,7 @@ export default function TaskHistory() {
                         <p className={cn(
                           "font-medium text-secondary dark:text-secondary-light"
                         )}>
-                          {task.xp_earned} XP
+                          {task.xp_earned.toLocaleString()} XP
                         </p>
                       </div>
                       <div>
@@ -117,6 +142,16 @@ export default function TaskHistory() {
           </p>
         )}
       </div>
+      <ConfirmModal
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleDeleteAllCompleted}
+        title="Clear All History?"
+        message="Are you sure you want to delete all completed tasks from your history? This action cannot be undone."
+        confirmText="Clear History"
+        cancelText="Cancel"
+        variant="destructive"
+      />
     </div>
   );
 }

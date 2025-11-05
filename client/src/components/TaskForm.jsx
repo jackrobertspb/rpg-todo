@@ -1,8 +1,17 @@
 import React, { useState, useEffect, memo, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import apiClient from '../api/client';
-import { cn } from '../utils/cn';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Select } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import Tooltip from './Tooltip';
+import ConfirmModal from './ConfirmModal';
 
-const TaskForm = memo(function TaskForm({ labels, onSubmit, onCancel, initialTask = null }) {
+const TaskForm = memo(function TaskForm({ labels, onSubmit, onCancel, initialTask = null, onLabelsChange }) {
   const [title, setTitle] = useState(initialTask?.title || '');
   const [description, setDescription] = useState(initialTask?.description || '');
   const [priority, setPriority] = useState(initialTask?.priority || 'Medium');
@@ -14,6 +23,13 @@ const TaskForm = memo(function TaskForm({ labels, onSubmit, onCancel, initialTas
   );
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  
+  // Label management state
+  const [showLabelManagement, setShowLabelManagement] = useState(false);
+  const [newLabelName, setNewLabelName] = useState('');
+  const [editingLabel, setEditingLabel] = useState(null);
+  const [editLabelName, setEditLabelName] = useState('');
+  const [deleteLabelConfirm, setDeleteLabelConfirm] = useState(null); // { labelId, labelName }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,8 +56,7 @@ const TaskForm = memo(function TaskForm({ labels, onSubmit, onCancel, initialTas
       console.error('Error submitting task:', error);
       // Reset submitted flag on error so user can retry
       setSubmitted(false);
-      // Show error to user
-      alert(error.response?.data?.error || error.message || 'Failed to create task. Please try again.');
+      // Error is already shown by Dashboard via toast
     } finally {
       setLoading(false);
     }
@@ -55,103 +70,243 @@ const TaskForm = memo(function TaskForm({ labels, onSubmit, onCancel, initialTas
     );
   };
 
+  const handleCreateLabel = async () => {
+    if (!newLabelName.trim()) {
+      toast.error('Label name cannot be empty');
+      return;
+    }
+
+    try {
+      await apiClient.post('/labels', { name: newLabelName.trim() });
+      setNewLabelName('');
+      toast.success('Label created!');
+      if (onLabelsChange) await onLabelsChange();
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Failed to create label');
+    }
+  };
+
+  const handleUpdateLabel = async (labelId) => {
+    if (!editLabelName.trim()) {
+      toast.error('Label name cannot be empty');
+      return;
+    }
+
+    try {
+      await apiClient.put(`/labels/${labelId}`, { name: editLabelName.trim() });
+      setEditingLabel(null);
+      setEditLabelName('');
+      toast.success('Label updated!');
+      if (onLabelsChange) await onLabelsChange();
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Failed to update label');
+    }
+  };
+
+  const handleDeleteLabel = (labelId) => {
+    const label = labels.find(l => l.id === labelId);
+    setDeleteLabelConfirm({
+      labelId,
+      labelName: label?.name || 'this label'
+    });
+  };
+
+  const confirmDeleteLabel = async () => {
+    if (!deleteLabelConfirm) return;
+
+    try {
+      await apiClient.delete(`/labels/${deleteLabelConfirm.labelId}`);
+      setSelectedLabels(prev => prev.filter(id => id !== deleteLabelConfirm.labelId));
+      toast.success('Label deleted!');
+      if (onLabelsChange) await onLabelsChange();
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Failed to delete label');
+    }
+  };
+
   return (
-    <div className={cn(
-      "mb-6 p-6 rounded-lg border",
-      "bg-white dark:bg-primary",
-      "border-primary dark:border-primary-light",
-      "shadow-lg"
-    )}>
-      <h3 className={cn(
-        "text-xl font-rpg font-bold mb-4",
-        "text-primary dark:text-white"
-      )}>
-        {initialTask ? 'Edit Task' : 'Create New Task'}
-      </h3>
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <Card className="mb-8">
+      <CardHeader>
+        <CardTitle className="text-2xl font-sans">
+          {initialTask ? 'Edit Task' : 'Create New Task'}
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label className="block mb-2 text-sm font-medium text-primary dark:text-white">
-            Title *
-          </label>
-          <input
+          <Tooltip content="Enter a short, descriptive title for your task" position="top">
+            <Label>Title * ℹ️</Label>
+          </Tooltip>
+          <Input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
-            className={cn(
-              "w-full px-4 py-2 rounded border",
-              "border-primary dark:border-primary-light",
-              "focus:outline-none focus:ring-2 focus:ring-secondary",
-              "bg-white dark:bg-primary-dark",
-              "text-primary dark:text-white"
-            )}
+            placeholder="e.g., Complete project report"
           />
         </div>
         <div>
-          <label className="block mb-2 text-sm font-medium text-primary dark:text-white">
-            Description
-          </label>
-          <textarea
+          <Tooltip content="Add additional details about your task (optional)" position="top">
+            <Label>Description ℹ️</Label>
+          </Tooltip>
+          <Textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            rows={3}
-            className={cn(
-              "w-full px-4 py-2 rounded border",
-              "border-primary dark:border-primary-light",
-              "focus:outline-none focus:ring-2 focus:ring-secondary",
-              "bg-white dark:bg-primary-dark",
-              "text-primary dark:text-white"
-            )}
+            rows={4}
+            placeholder="e.g., Need to finalize the Q4 report with charts and submit by Friday"
           />
         </div>
         <div>
-          <label className="block mb-2 text-sm font-medium text-primary dark:text-white">
-            Priority *
-          </label>
-          <select
+          <Tooltip content="Set task priority - higher priority tasks earn more XP when completed" position="top">
+            <Label>Priority * ℹ️</Label>
+          </Tooltip>
+          <Select
             value={priority}
             onChange={(e) => setPriority(e.target.value)}
             required
-            className={cn(
-              "w-full px-4 py-2 rounded border",
-              "border-primary dark:border-primary-light",
-              "focus:outline-none focus:ring-2 focus:ring-secondary",
-              "bg-white dark:bg-primary-dark",
-              "text-primary dark:text-white"
-            )}
           >
             <option value="High">High</option>
             <option value="Medium">Medium</option>
             <option value="Low">Low</option>
-          </select>
+          </Select>
           <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
             High: 100 XP, Medium: 50 XP, Low: 25 XP
           </p>
         </div>
         <div>
-          <label className="block mb-2 text-sm font-medium text-primary dark:text-white">
-            Due Date
-          </label>
-          <input
+          <Tooltip content="Set a deadline for this task (optional)" position="top">
+            <Label>Due Date ℹ️</Label>
+          </Tooltip>
+          <Input
             type="date"
             value={dueDate}
             onChange={(e) => setDueDate(e.target.value)}
-            className={cn(
-              "w-full px-4 py-2 rounded border",
-              "border-primary dark:border-primary-light",
-              "focus:outline-none focus:ring-2 focus:ring-secondary",
-              "bg-white dark:bg-primary-dark",
-              "text-primary dark:text-white"
-            )}
           />
         </div>
         <div>
-          <label className="block mb-2 text-sm font-medium text-primary dark:text-white">
-            Labels
-          </label>
+          <div className="flex items-center justify-between mb-2">
+            <Tooltip content="Select labels to organize your task - you can select multiple labels" position="top">
+              <label className="text-sm font-medium text-primary dark:text-white cursor-help">
+                Labels ℹ️
+              </label>
+            </Tooltip>
+            <button
+              type="button"
+              onClick={() => setShowLabelManagement(!showLabelManagement)}
+              className="text-xs text-secondary hover:underline"
+            >
+              {showLabelManagement ? 'Hide' : 'Manage Labels'}
+            </button>
+          </div>
+          
+          {showLabelManagement && (
+            <div className="mb-4 p-4 bg-gray-50 dark:bg-primary-dark rounded border border-gray-300 dark:border-primary-light">
+              {/* Create New Label */}
+              <div className="mb-4">
+                <label className="block text-xs font-medium text-primary dark:text-white mb-1">
+                  Create New Label
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newLabelName}
+                    onChange={(e) => setNewLabelName(e.target.value)}
+                    placeholder="Label name"
+                    className={cn(
+                      "flex-1 px-3 py-1 text-sm rounded border",
+                      "border-primary dark:border-primary-light",
+                      "bg-white dark:bg-primary-dark",
+                      "text-primary dark:text-white"
+                    )}
+                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleCreateLabel())}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleCreateLabel}
+                    className="px-3 py-1 text-sm rounded bg-secondary text-white hover:bg-secondary-light"
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
+
+              {/* Edit/Delete Existing Labels */}
+              {labels.length > 0 && (
+                <div>
+                  <label className="block text-xs font-medium text-primary dark:text-white mb-2">
+                    Manage Existing Labels
+                  </label>
+                  <div className="space-y-2">
+                    {labels.map((label) => (
+                      <div key={label.id} className="flex items-center gap-2">
+                        {editingLabel === label.id ? (
+                          <>
+                            <input
+                              type="text"
+                              value={editLabelName}
+                              onChange={(e) => setEditLabelName(e.target.value)}
+                              className={cn(
+                                "flex-1 px-2 py-1 text-sm rounded border",
+                                "border-primary dark:border-primary-light",
+                                "bg-white dark:bg-primary-dark",
+                                "text-primary dark:text-white"
+                              )}
+                              autoFocus
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleUpdateLabel(label.id)}
+                              className="px-2 py-1 text-xs rounded bg-green-500 text-white hover:bg-green-600"
+                            >
+                              Save
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditingLabel(null);
+                                setEditLabelName('');
+                              }}
+                              className="px-2 py-1 text-xs rounded bg-gray-500 text-white hover:bg-gray-600"
+                            >
+                              Cancel
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <span className="flex-1 text-sm text-primary dark:text-white">
+                              {label.name}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditingLabel(label.id);
+                                setEditLabelName(label.name);
+                              }}
+                              className="px-2 py-1 text-xs rounded bg-blue-500 text-white hover:bg-blue-600"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteLabel(label.id)}
+                              className="px-2 py-1 text-xs rounded bg-red-500 text-white hover:bg-red-600"
+                            >
+                              Delete
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Select Labels for Task */}
           {labels.length === 0 ? (
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-              No labels available. Labels will appear here once you have some.
+              No labels available. Create one above!
             </p>
           ) : (
             <div className="flex flex-wrap gap-2">
@@ -209,8 +364,19 @@ const TaskForm = memo(function TaskForm({ labels, onSubmit, onCancel, initialTas
             Cancel
           </button>
         </div>
-      </form>
-    </div>
+        </form>
+      </CardContent>
+      <ConfirmModal
+        isOpen={!!deleteLabelConfirm}
+        onClose={() => setDeleteLabelConfirm(null)}
+        onConfirm={confirmDeleteLabel}
+        title="Delete Label?"
+        message={`Are you sure you want to delete the label "${deleteLabelConfirm?.labelName}"? It will be removed from all tasks.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="destructive"
+      />
+    </Card>
   );
 });
 

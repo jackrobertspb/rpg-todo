@@ -230,11 +230,36 @@ router.post('/', async (req, res) => {
   }
 });
 
+// DEBUG: Delete all completed tasks
+router.delete('/debug/delete-completed', async (req, res) => {
+  try {
+    const userId = req.userId;
+
+    // Delete all completed tasks for this user
+    const { error } = await supabase
+      .from('tasks')
+      .delete()
+      .eq('user_id', userId)
+      .eq('is_complete', true);
+
+    if (error) {
+      return res.status(500).json({ error: error.message });
+    }
+
+    res.json({ message: 'All completed tasks deleted' });
+  } catch (error) {
+    console.error('Delete completed tasks error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Mark task as complete
 router.post('/:id/complete', async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.userId;
+
+    console.log(`[Task Complete] Attempting to complete task ${id} for user ${userId}`);
 
     // Get task to check it exists and belongs to user
     const { data: task, error: taskError } = await supabase
@@ -245,10 +270,14 @@ router.post('/:id/complete', async (req, res) => {
       .single();
 
     if (taskError || !task) {
+      console.error(`[Task Complete] Task not found:`, taskError);
       return res.status(404).json({ error: 'Task not found' });
     }
 
+    console.log(`[Task Complete] Task found:`, { id: task.id, title: task.title, is_complete: task.is_complete });
+
     if (task.is_complete) {
+      console.warn(`[Task Complete] Task ${id} is already complete!`);
       return res.status(400).json({ error: 'Task is already complete' });
     }
 
