@@ -1,0 +1,69 @@
+---
+alwaysApply: false
+---
+
+# Shadcn Coding Standards
+
+## Component Usage
+
+- Use Shadcn components from the components directory
+- Customize components by copying to your project (they're not npm packages)
+- Follow Shadcn's composition pattern
+- Extend components rather than modifying source when possible
+
+## Component Structure
+
+- Shadcn components are composable - use them together
+- Use Radix UI primitives when Shadcn doesn't have a component
+- Maintain consistent styling with Tailwind CSS
+- Use component variants (e.g., size, variant props)
+
+## Styling
+
+- Customize via Tailwind classes, not by modifying component source
+- Use cn() utility for conditional class names
+- Follow Shadcn's design tokens (colors, spacing, etc.)
+- Maintain accessibility features built into components
+
+## Composition Pattern
+
+- Compose multiple Shadcn components for complex UI
+- Use Dialog + Form for modals with forms
+- Use Button + Icon for icon buttons
+- Use Card + CardHeader + CardContent for card layouts
+
+## Props and Variants
+
+- Use Shadcn's variant system consistently
+- Pass through valid HTML attributes to Shadcn components
+- Extend props via TypeScript interfaces when needed
+- Document custom props and variants
+
+## Accessibility
+
+- Don't remove accessibility features from Shadcn components
+- Ensure keyboard navigation works
+- Maintain proper ARIA attributes
+- Test with screen readers
+
+## Code Style
+
+- Import components from '@/components/ui/'
+- Use descriptive prop names
+- Group related props together
+- Use TypeScript for all component props
+
+## Best Practices
+
+- Prefer Shadcn components over custom implementations
+- Customize via Tailwind, not CSS modules
+- Keep component usage consistent across the app
+- Use Shadcn's theme customization when needed
+- Follow Shadcn's component patterns for new similar components
+
+## Component Integration
+
+- Integrate Shadcn components with React Hook Form when needed
+- Use Shadcn's Form components for form handling
+- Combine Shadcn components with Tailwind utilities
+- Maintain Shadcn's design system consistency

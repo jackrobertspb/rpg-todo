@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .overflow-wrap-anywhere {
+    overflow-wrap: anywhere;
+  }
+}
+
+:root {
+  --background: #f0fdfa;
+  --foreground: #134e4a;
+}
+
+.dark {
+  --background: #042f2e;
+  --foreground: #f0fdfa;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+

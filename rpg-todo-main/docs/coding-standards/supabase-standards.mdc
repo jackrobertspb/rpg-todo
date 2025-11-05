@@ -1,0 +1,87 @@
+---
+alwaysApply: false
+---
+
+# Supabase Coding Standards
+
+## Database Schema
+
+- Use snake_case for table and column names (PostgreSQL convention)
+- Use singular nouns for table names
+- Define primary keys for all tables
+- Use UUIDs for primary keys when appropriate
+- Add indexes for frequently queried columns
+- Use foreign keys with proper constraints
+- Add timestamps (created_at, updated_at) to tables
+
+## Query Patterns
+
+- Use parameterized queries to prevent SQL injection
+- Prefer Supabase client methods over raw SQL when possible
+- Use TypeScript types generated from database schema
+- Implement proper error handling for database operations
+- Use transactions for multi-step operations
+
+## Client Setup
+
+- Initialize Supabase client once and reuse
+- Use environment variables for Supabase URL and keys
+- Create separate clients for different contexts if needed (server vs client)
+- Handle connection errors gracefully
+
+## Authentication
+
+- Use Supabase Auth for user authentication
+- Validate user sessions before protected operations
+- Use Row Level Security (RLS) policies for data access control
+- Never expose service role keys in client-side code
+
+## Row Level Security (RLS)
+
+- Enable RLS on all tables containing user data
+- Write clear, testable RLS policies
+- Document RLS policies for each table
+- Test RLS policies thoroughly
+
+## Data Types
+
+- Use appropriate PostgreSQL types
+- Use JSONB for flexible schema data when needed
+- Use ENUMs for fixed value sets
+- Use timestamptz for timestamp columns
+
+## Migrations
+
+- Use Supabase migration system for schema changes
+- Write reversible migrations when possible
+- Test migrations on development before production
+- Document schema changes in migration files
+
+## Error Handling
+
+- Handle Supabase errors appropriately
+- Check for null/undefined results
+- Validate data before inserting/updating
+- Provide meaningful error messages
+
+## Code Style
+
+- Use async/await for database operations
+- Handle promise rejections properly
+- Use TypeScript for type safety
+- Name queries descriptively
+
+## Best Practices
+
+- Don't fetch more data than needed (use select)
+- Use pagination for large result sets
+- Implement proper indexing strategies
+- Monitor query performance
+- Use real-time subscriptions sparingly
+
+## Code Organization
+
+- Create separate service/utility files for database operations
+- Keep database logic separate from business logic
+- Use consistent naming for database functions
+- Document complex queries
